@@ -1,0 +1,22 @@
+{
+  "name": "flappy-phaser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node_modules/.bin/webpack-dev-server --hot",
+    "build": "node_modules/.bin/webpack",
+    "build:prod": "node_modules/.bin/webpack -p"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "phaser-ce": "^2.7.5"
+  },
+  "devDependencies": {
+    "ts-loader": "^2.0.3",
+    "typescript": "^2.2.2",
+    "webpack": "^2.3.3",
+    "webpack-dev-server": "^2.4.2"
+  }
+}
