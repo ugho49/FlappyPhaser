@@ -11,13 +11,15 @@ export class Flappy {
     mainState = {
         preload: this.preload,
         create: this.create,
-        update: this.update
+        update: this.update,
+        jump: this.jump,
+        restartGame: this.restartGame
     };
 
     constructor() {
         this.game = new Phaser.Game(this.gameWidth, this.gameHeight, Phaser.AUTO, "content");
-        this.game.state.add('main', this.mainState);
-        this.game.state.start('main');
+        this.game.state.add("main", this.mainState);
+        this.game.state.start("main");
     }
 
     preload() {
@@ -38,16 +40,16 @@ export class Flappy {
         // Needed for: movements, gravity, collisions, etc.
         this.game.physics.arcade.enable(this.bird);
         // Add gravity to the bird to make it fall
-        this.bird.body.gravity.y = 1000;
+        this.bird.body.gravity.add(0, 1000);
         // Call the 'jump' function when the spacekey is hit
         let spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this);
-        //this.game.input.onDown.add(this.jump, this);
     }
 
     update() {
         // If the bird is out of the screen (too high or too low)
         // Call the 'restartGame' function
+
         if (this.bird.y < 0 || this.bird.y > this.gameHeight) {
             this.restartGame();
         }
@@ -56,12 +58,12 @@ export class Flappy {
     jump() {
         console.log("jump called");
         // Add a vertical velocity to the bird
-        this.bird.body.velocity.y = -350;
+        this.bird.body.velocity.add(0, -250);
     }
 
     restartGame() {
         console.log("you loose");
         //this.
-        this.game.state.start('main');
+        this.game.state.restart();
     }
 }
