@@ -5,7 +5,7 @@ export class Flappy {
 
     private game: Phaser.Game;
 
-    private labelStyle = { font: "30px Arial", fill: "#000000" };
+    private labelStyle = { font: "30px IndieFlower", fill: "#000000" };
     private scoreService: ScoreService;
     private currentScore: number = 0;
     private gameWidth: number;
@@ -68,9 +68,8 @@ export class Flappy {
             this.pipes = this.game.add.group();
             // Create an empty group
             this.fires = this.game.add.group();
-            // Show label "press to start"
-            this.labelClickToStart = this.game.add.text(100, 350, "Press space to start", this.labelStyle);
-
+            // Label "Press to begin"
+            this.labelClickToStart = this.game.add.text(100, 350, "", this.labelStyle);
             // Call the 'jump' function when the spacekey is hit
             let spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
             spaceKey.onDown.add(this.mainState.jump);
@@ -110,6 +109,11 @@ export class Flappy {
                 }
 
                 this.game.physics.arcade.overlap(this.rocket, this.pipes, this.mainState.hitPipe, null, this);
+            } else {
+                if (this.labelClickToStart != null) {
+                    this.labelClickToStart.destroy();
+                    this.labelClickToStart = this.game.add.text(100, 350, "Press space to start", this.labelStyle);
+                }
             }
         },
 
