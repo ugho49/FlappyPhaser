@@ -8,8 +8,8 @@ export class Flappy {
     private labelStyle = { font: "30px Arial", fill: "#000000" };
     private scoreService: ScoreService;
     private currentScore: number = 0;
-    private gameWidth: number = 800;
-    private gameHeight: number = 600;
+    private gameWidth: number;
+    private gameHeight: number;
 
     private gameStarted: boolean = false;
     private labelClickToStart: Phaser.Text;
@@ -24,6 +24,8 @@ export class Flappy {
     private background: Phaser.TileSprite;
 
     constructor() {
+        this.gameHeight = window.innerHeight /*600*/;
+        this.gameWidth = window.innerWidth /*800*/;
         this.scoreService = new ScoreService("flappy");
         this.game = new Phaser.Game(this.gameWidth, this.gameHeight, Phaser.AUTO, "content", this.mainState);
     }
@@ -45,27 +47,16 @@ export class Flappy {
             // Set the background
             this.game.stage.setBackgroundColor('#ffffff');
             this.background = this.game.add.tileSprite(0, 0, this.gameWidth, this.gameHeight, 'background');
-            this.background.tileScale.x = 0.6;
-            this.background.tileScale.y = 0.6;
 
-            /* TODO : delete this
-            let tube = this.game.add.sprite(this.gameWidth, 0, 'tube');
-            tube.scale.setTo(0.4, 0.4);
-            this.game.physics.arcade.enable(tube);
-            tube.body.velocity.x = -400;
-
-            let tube2 = this.game.add.sprite(this.gameWidth + 96 , 600, 'tube');
-            tube2.scale.setTo(0.4, 0.4);
-            tube2.angle = 180;
-            this.game.physics.arcade.enable(tube2);
-            tube2.body.velocity.x = -400;*/
+            this.background.tileScale.x = 0.68;
+            this.background.tileScale.y = 0.68;
 
             // Set the physics system
             this.game.physics.startSystem(Phaser.Physics.ARCADE);
             // Display the rocket at the position x=100 and y=245
             this.rocket = this.game.add.sprite(100, 270, 'rocket');
             this.rocket.scale.setTo(0.25, 0.25);
-            this.rocket.checkWorldBounds = true;
+            //this.rocket.checkWorldBounds = true;
             // Move the anchor to the left and downward
             this.rocket.anchor.setTo(-0.1, 0.5);
             // Add physics to the rocket
@@ -103,6 +94,7 @@ export class Flappy {
                     }
                 }, this);
 
+
                 if (this.rocket.y <= 0) {
                     // If the rocket is out of the screen (too low)
                     // Call the 'restartGame' function
@@ -133,7 +125,7 @@ export class Flappy {
                 // Destroy label "press to start"
                 this.labelClickToStart.destroy();
                 // Add pipes every 1.8s
-                this.timer = this.game.time.events.loop(1300, this.mainState.addRowOfPipes2);
+                this.timer = this.game.time.events.loop(1200, this.mainState.addRowOfPipes);
             } else {
 
                 if (this.rocket.alive == false) {
@@ -192,33 +184,16 @@ export class Flappy {
 
         },
 
-        addOnePipe: (x: number, y: number) => {
-            // Create a pipe at the position x and y
-            let pipe = this.game.add.sprite(x, y, 'pipe');
-            pipe.data.scoreDone = false;
-            // Automatically kill the pipe when it's no longer visible
-            //pipe.checkWorldBounds = true;
-            //pipe.outOfBoundsKill = true;
-
-            // Add the pipe to our previously created group
-            this.pipes.add(pipe);
-
-            // Enable physics on the pipe
-            this.game.physics.arcade.enable(pipe);
-
-            // Add velocity to the pipe to make it move left
-            pipe.body.velocity.x = -400;
-
-        },
-
-        addOnePipe2: (y:number = 0, reverse: boolean = false) => {
+        addOnePipe: (y:number, gate: number, reverse: boolean = false) => {
 
             let pipe;
             if (!reverse) {
-                pipe = this.game.add.sprite(this.gameWidth, y, 'tube');
+                pipe = this.game.add.sprite(this.gameWidth, y + gate, 'tube');
+                pipe.scale.setTo(0.435, 0.435);
+
             } else {
-                pipe = this.game.add.sprite(this.gameWidth + 96 , y, 'tube');
-                pipe.angle = 180;
+                pipe = this.game.add.sprite(this.gameWidth + 105, y + gate, 'tube');
+                pipe.scale.setTo(-0.435, -0.435);
             }
 
             pipe.data.scoreDone = false;
@@ -226,40 +201,28 @@ export class Flappy {
             // Add the pipe to our previously created group
             this.pipes.add(pipe);
 
-            // Set scale
-            pipe.scale.setTo(0.4, 0.4);
-
             // Enable physics on the pipe
             this.game.physics.arcade.enable(pipe);
 
             // Add velocity to the pipe to make it move left
             pipe.body.velocity.x = -400;
-
         },
 
         addRowOfPipes: () => {
-            // Randomly pick a number between 1 and 5
-            // This will be the hole position
-            let hole = Math.floor(Math.random() * 5) + 1;
+            // Randomly pick a number between 450 and 70
+            let value = Math.floor(Math.random() * 450) + 70;
 
-            //let hole = Math.floor(Math.random() * 50) + 50;
-
-            // Add the 12 pipes
-            // With one big hole at position 'hole' and 'hole + 1'
-            for (let i = 0; i < 10; i++) {
-                if (i != hole && i != hole + 1) {
-                    this.mainState.addOnePipe(this.gameWidth, i * 60 + 5);
-                }
+            if (value > 450) {
+                value = 450;
+            } else if (value < 70) {
+                value = 70;
             }
-        },
 
-        addRowOfPipes2: () => {
-            // Randomly pick a number between 1 and 5
-            // This will be the hole position
-            let hole = Math.floor(Math.random() * 5);
+            let holeP2 = value;
+            let holeP1 = holeP2 - 520;
 
-            this.mainState.addOnePipe2();
-            this.mainState.addOnePipe2(600, true);
+            this.mainState.addOnePipe(0, holeP1);
+            this.mainState.addOnePipe(this.gameHeight, holeP2, true);
         },
 
         updateScore: () => {
@@ -304,7 +267,7 @@ export class Flappy {
 
         moveBackground: () => {
             if (!this.background.data.stopPosition) {
-                this.background.tilePosition.x -= 10;
+                this.background.tilePosition.x -= 8;
             } else {
                 this.background.tilePosition.x = this.background.data.stopPosition;
             }
