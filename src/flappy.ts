@@ -71,8 +71,10 @@ export class Flappy {
             // Label "Press to begin"
             this.labelClickToStart = this.game.add.text(100, 350, "", this.labelStyle);
             // Call the 'jump' function when the spacekey is hit
-            let spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-            spaceKey.onDown.add(this.mainState.jump);
+            /*let spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+            spaceKey.onDown.add(this.mainState.jump);*/
+
+            this.game.input.onDown.add(this.mainState.jump, this);
         },
 
         update: () => {
