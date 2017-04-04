@@ -170,7 +170,7 @@ export class Flappy {
 
             if (this.fires.length == 0) {
                 let f1 = this.game.add.sprite(0, 0, 'fire');
-                let f2 = this.game.add.sprite(0, 0, 'fire2');
+                let f2 = this.game.add.sprite(10, 0, 'fire2');
 
                 f1.alpha = 0;
                 f1.scale.setTo(0.25, 0.25);
@@ -184,6 +184,7 @@ export class Flappy {
                 this.fires.add(f1);
                 this.fires.add(f2);
             }
+
 
             this.fires.x = this.rocket.x - 20;
             this.fires.y = this.rocket.y - 5;
