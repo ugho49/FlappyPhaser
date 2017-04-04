@@ -114,7 +114,7 @@ export class Flappy {
             } else {
                 if (this.labelClickToStart != null) {
                     this.labelClickToStart.destroy();
-                    this.labelClickToStart = this.game.add.text(100, 350, "Press space to start", this.labelStyle);
+                    this.labelClickToStart = this.game.add.text(100, 350, "Click to begin", this.labelStyle);
                 }
             }
         },
