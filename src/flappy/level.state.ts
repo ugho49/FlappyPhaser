@@ -1,10 +1,11 @@
 import {ScoreService} from "../score.service";
 import {Constantes} from "./contantes";
+import {LooseState} from "./loose.state";
 
 export class LevelState extends Phaser.State {
 
-    private currentScore: number = 0;
-    private gameStarted: boolean = false;
+    private currentScore: number;
+    private gameStarted: boolean;
 
     private scoreService: ScoreService;
     private backgroundTween: Phaser.Tween;
@@ -12,18 +13,20 @@ export class LevelState extends Phaser.State {
     private jumpSound: Phaser.Sound;
     private pipes: Phaser.Group;
     private fires: Phaser.Group;
-    private labelClickToStart: Phaser.Text;
     private timer: Phaser.TimerEvent;
-    private labelHightScore: Phaser.Text;
-    private labelCurrentScore: Phaser.Text;
+    private labelHightScore: Phaser.BitmapText;
+    private labelCurrentScore: Phaser.BitmapText;
+    private labelClickToStart: Phaser.BitmapText;
 
     constructor() {
         super();
-        console.log("Level");
         this.scoreService = new ScoreService(Constantes.GAME_NAME);
     }
 
     create() {
+        this.currentScore = 0;
+        this.gameStarted = false;
+
         // Set the background
         this.game.stage.setBackgroundColor('#ffffff');
         let background = this.game.add.sprite(0, 0, 'background');
@@ -49,7 +52,8 @@ export class LevelState extends Phaser.State {
         // Create an empty group
         this.fires = this.game.add.group();
         // Label "Press to begin"
-        this.labelClickToStart = this.game.add.text(100, 350, "", Constantes.labelStyle);
+        this.labelClickToStart = this.game.add.bitmapText(270, 240, 'myfont', 'Toucher pour commencer', 60);
+        this.labelClickToStart.smoothed = true;
         // Call the 'jump' function when the spacekey is hit
         let spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this);
@@ -90,11 +94,6 @@ export class LevelState extends Phaser.State {
 
             if (this.rocket.angle < 10)  {
                 this.rocket.angle += 1;
-            }
-        } else {
-            if (this.labelClickToStart != null) {
-                this.labelClickToStart.destroy();
-                this.labelClickToStart = this.game.add.text(100, 350, "Click to begin", Constantes.labelStyle);
             }
         }
     }
@@ -155,13 +154,13 @@ export class LevelState extends Phaser.State {
 
     restartGame() {
         this.scoreService.setHightscore(this.currentScore);
-        //console.log("you loose");
-        this.game.paused = true;
+        /*this.game.paused = true;
 
         alert("Vous avez perdu !");
-        location.reload();
+        location.reload();*/
 
-        //this.game.state.start("boot");
+        LooseState.currentScore = this.currentScore;
+        this.game.state.start("loose");
     }
 
     updateRocketFire() {
@@ -248,14 +247,17 @@ export class LevelState extends Phaser.State {
     updateScore() {
         // Hightscore label is define only at beginning
         if (this.labelHightScore == null) {
-            this.labelHightScore = this.game.add.text(20, 20, "Hightscore : " + this.scoreService.getHightscore(), Constantes.labelStyle);
+            this.labelHightScore = this.game.add.bitmapText(20, 20, 'myfont', 'Hightscore : ' + this.scoreService.getHightscore(), 40);
+            this.labelHightScore.smoothed = true;
         }
 
+        const currText = "Actuel : " + this.currentScore.toString();
         // If current is not define, define it, else update it
         if (this.labelCurrentScore == null) {
-            this.labelCurrentScore = this.game.add.text(20, 60, "Current : " + this.currentScore.toString(), Constantes.labelStyle);
+            this.labelCurrentScore = this.game.add.bitmapText(20, 60, 'myfont', currText, 40);
+            this.labelCurrentScore.smoothed = true;
         } else {
-            this.labelCurrentScore.text = "Current : " + this.currentScore.toString();
+            this.labelCurrentScore.text = currText;
         }
     }
 
