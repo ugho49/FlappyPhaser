@@ -40,8 +40,6 @@ export class LevelState extends Phaser.State {
         this.rocket.scale.setTo(0.25, 0.25);
         // Move the anchor to the left and downward
         this.rocket.anchor.setTo(-0.1, 0.5);
-        this.rocket.animations.add('walk');
-        this.rocket.animations.play('walk', 5, true);
         // Add physics to the rocket
         // Needed for: movements, gravity, collisions, etc.
         this.game.physics.arcade.enable(this.rocket);
@@ -92,6 +90,8 @@ export class LevelState extends Phaser.State {
             if (this.rocket.angle < 10)  {
                 this.rocket.angle += 1;
             }
+        } else {
+            this.rocket.frame = 2;
         }
     }
 
@@ -103,6 +103,9 @@ export class LevelState extends Phaser.State {
             // Add gravity to the rocket to make it fall
             this.rocket.body.gravity.y = 2500;
 
+            this.rocket.animations.add('walk');
+            this.rocket.animations.play('walk', 5, true);
+
             // Show scores
             this.updateScore();
             // Destroy label "press to start"
@@ -111,16 +114,18 @@ export class LevelState extends Phaser.State {
         } else {
 
             if (this.rocket.alive == false) {
-            return;
-        }
+                return;
+            }
 
-        // JUMP
-        // Add a vertical velocity to the rocket
-        this.rocket.body.velocity.y = -700;
-        // Play sound
-        this.jumpSound.play();
-        // Create an animation on the rocket
-        this.game.add.tween(this.rocket).to({angle: -10}, 200).start();
+            // JUMP
+            // Add a vertical velocity to the rocket
+            this.rocket.body.velocity.y = -700;
+            // Play sound
+            this.jumpSound.play();
+            // Create an animation on the rocket
+            this.game.add.tween(this.rocket).to({angle: -10}, 200).start();
+            // Fire animation
+            this.rocket.frame = 1;
         }
     }
 
@@ -151,11 +156,6 @@ export class LevelState extends Phaser.State {
 
     restartGame() {
         this.scoreService.setHightscore(this.currentScore);
-        /*this.game.paused = true;
-
-        alert("Vous avez perdu !");
-        location.reload();*/
-
         LooseState.currentScore = this.currentScore;
         this.game.state.start("loose");
     }
