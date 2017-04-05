@@ -12,7 +12,6 @@ export class LevelState extends Phaser.State {
     private rocket: Phaser.Sprite;
     private jumpSound: Phaser.Sound;
     private pipes: Phaser.Group;
-    private fires: Phaser.Group;
     private timer: Phaser.TimerEvent;
     private labelHightScore: Phaser.BitmapText;
     private labelCurrentScore: Phaser.BitmapText;
@@ -37,11 +36,12 @@ export class LevelState extends Phaser.State {
         // Set the physics system
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         // Display the rocket at the position x=100 and y=245
-        this.rocket = this.game.add.sprite(100, 270, 'rocket');
+        this.rocket = this.game.add.sprite(70, 270, 'rocket');
         this.rocket.scale.setTo(0.25, 0.25);
-        //this.rocket.checkWorldBounds = true;
         // Move the anchor to the left and downward
         this.rocket.anchor.setTo(-0.1, 0.5);
+        this.rocket.animations.add('walk');
+        this.rocket.animations.play('walk', 5, true);
         // Add physics to the rocket
         // Needed for: movements, gravity, collisions, etc.
         this.game.physics.arcade.enable(this.rocket);
@@ -49,8 +49,6 @@ export class LevelState extends Phaser.State {
         this.jumpSound = this.game.add.audio('jump');
         // Create an empty group
         this.pipes = this.game.add.group();
-        // Create an empty group
-        this.fires = this.game.add.group();
         // Label "Press to begin"
         this.labelClickToStart = this.game.add.bitmapText(270, 240, 'myfont', 'Toucher pour commencer', 60);
         this.labelClickToStart.smoothed = true;
@@ -61,7 +59,6 @@ export class LevelState extends Phaser.State {
     }
 
     update() {
-        this.updateRocketFire();
 
         if (this.gameStarted) {
 
@@ -161,32 +158,6 @@ export class LevelState extends Phaser.State {
 
         LooseState.currentScore = this.currentScore;
         this.game.state.start("loose");
-    }
-
-    updateRocketFire() {
-
-        if (this.fires.length == 0) {
-            let f1 = this.game.add.sprite(0, 0, 'fire');
-            let f2 = this.game.add.sprite(10, 0, 'fire2');
-
-            f1.alpha = 0;
-            f1.scale.setTo(0.25, 0.25);
-
-            f2.alpha = 0;
-            f2.scale.setTo(0.25, 0.25);
-
-            this.game.add.tween(f1).to( { alpha: 1 }, 800,  "Linear", true, 0, -1, true);
-            this.game.add.tween(f2).to( { alpha: 1 }, 800,  "Linear", true, 800, -1, true);
-
-            this.fires.add(f1);
-            this.fires.add(f2);
-        }
-
-
-        this.fires.x = this.rocket.x - 20;
-        this.fires.y = this.rocket.y - 5;
-        this.fires.angle = this.rocket.angle;
-
     }
 
     addOnePipe(y:number, gate: number, reverse: boolean = false) {

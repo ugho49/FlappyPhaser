@@ -8,6 +8,7 @@ export class BootState extends Phaser.State {
     preload() {
 
         // Spritesheets
+        this.load.spritesheet('rocket', '/assets/rocket-sheet.png', 434, 163, 3, 0, 10);
         this.load.spritesheet('etoile', '/assets/etoile-sheet.png', 138, 159, 2, 0, 10);
         this.load.spritesheet('jouer', '/assets/jouer-sheet.png', 403, 191, 2, 0, 10);
         this.load.spritesheet('quitter', '/assets/quitter-sheet.png', 403, 191, 2, 0, 10);
@@ -16,7 +17,6 @@ export class BootState extends Phaser.State {
         // Images
         this.load.image('fire', '/assets/fire.png');
         this.load.image('fire2', '/assets/fire2.png');
-        this.load.image('rocket', '/assets/rocket.png');
         this.load.image('pipe', '/assets/tube.png');
         this.load.image('background', '/assets/fond.png');
         this.load.image('titre', '/assets/titre.png');
