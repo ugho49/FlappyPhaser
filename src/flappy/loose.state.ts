@@ -69,7 +69,7 @@ export class LooseState extends Phaser.State {
 
         this.game.state.remove('level');
         this.game.state.add('level', LevelState);
-        this.game.state.start('level', true, false);
+        this.game.state.start('level');
     }
 
     quit() {
