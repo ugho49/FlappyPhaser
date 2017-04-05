@@ -24,8 +24,8 @@ export class Flappy {
     private background: Phaser.TileSprite;
 
     constructor() {
-        this.gameHeight = window.innerHeight /*600*/;
-        this.gameWidth = window.innerWidth /*800*/;
+        this.gameHeight = /*window.innerHeight */600;
+        this.gameWidth = /*window.innerWidth*/ 800;
         this.scoreService = new ScoreService("flappy");
         this.game = new Phaser.Game(this.gameWidth, this.gameHeight, Phaser.AUTO, "content", this.mainState);
     }
@@ -38,8 +38,7 @@ export class Flappy {
             this.game.load.image('fire2', '/assets/fire2.png');
 
             this.game.load.image('rocket', '/assets/rocket.png');
-            this.game.load.image('pipe', '/assets/pipe.png');
-            this.game.load.image('tube', '/assets/tube.png');
+            this.game.load.image('pipe', '/assets/tube.png');
             this.game.load.audio('jump', '/assets/jump.wav');
         },
 
@@ -71,9 +70,8 @@ export class Flappy {
             // Label "Press to begin"
             this.labelClickToStart = this.game.add.text(100, 350, "", this.labelStyle);
             // Call the 'jump' function when the spacekey is hit
-            /*let spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-            spaceKey.onDown.add(this.mainState.jump);*/
-
+            let spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+            spaceKey.onDown.add(this.mainState.jump);
             this.game.input.onDown.add(this.mainState.jump, this);
         },
 
@@ -84,12 +82,14 @@ export class Flappy {
 
             if (this.gameStarted) {
 
+                this.mainState.manageTimer();
+
                 // Go through all the pipes
                 this.pipes.forEach((p: Phaser.Sprite) => {
                     if (p.position.x < 0) {
                         p.destroy();
                     } else if (p.position.x < 100.5 && p.position.x > 99.5 && !p.data.scoreDone) {
-                        this.currentScore += 1;
+                        this.currentScore++;
                         this.mainState.updateScore();
                         p.data.scoreDone = true;
                     }
@@ -117,6 +117,7 @@ export class Flappy {
                     this.labelClickToStart = this.game.add.text(100, 350, "Click to begin", this.labelStyle);
                 }
             }
+
         },
 
         jump: () => {
@@ -125,13 +126,13 @@ export class Flappy {
                 // LAUNCH GAME
                 this.gameStarted = true;
                 // Add gravity to the rocket to make it fall
-                this.rocket.body.gravity.y = 1600;
+                this.rocket.body.gravity.y = 1900;
+
                 // Show scores
                 this.mainState.updateScore();
                 // Destroy label "press to start"
                 this.labelClickToStart.destroy();
-                // Add pipes every 1.8s
-                this.timer = this.game.time.events.loop(1200, this.mainState.addRowOfPipes);
+
             } else {
 
                 if (this.rocket.alive == false) {
@@ -140,18 +141,38 @@ export class Flappy {
 
                 // JUMP
                 // Add a vertical velocity to the rocket
-                this.rocket.body.velocity.y = -500;
+                this.rocket.body.velocity.y = -560;
                 // Play sound
                 this.jumpSound.play();
                 // Create an animation on the rocket
-                let animation = this.game.add.tween(this.rocket);
-                // Change the angle of the rocket to -10° in 200 milliseconds
-                animation.to({angle: -10}, 200);
-                // And start the animation
-                animation.start();
+                this.game.add.tween(this.rocket).to({angle: -10}, 200).start();
+            }
+        },
+
+        manageTimer: () => {
+
+            let time;
+
+            if (this.currentScore < 15) {
+                time = 2500;
+            } else if (this.currentScore < 25 ) {
+                time = 2200;
+            } else {
+                time = 1900;
             }
 
+            if (this.timer == null) {
+                // Add pipes time
+                this.timer = this.game.time.events.loop(time, this.mainState.addRowOfPipes);
 
+                return;
+            } else {
+                if (this.timer.delay !== time) {
+                    this.game.time.events.remove(this.timer);
+                    this.timer = this.game.time.events.loop(time, this.mainState.addRowOfPipes);
+                    console.log("change time to : " + time + "ms");
+                }
+            }
         },
 
         restartGame: () => {
@@ -194,11 +215,11 @@ export class Flappy {
 
             let pipe;
             if (!reverse) {
-                pipe = this.game.add.sprite(this.gameWidth, y + gate, 'tube');
+                pipe = this.game.add.sprite(this.gameWidth, y + gate, 'pipe');
                 pipe.scale.setTo(0.435, 0.435);
 
             } else {
-                pipe = this.game.add.sprite(this.gameWidth + 105, y + gate, 'tube');
+                pipe = this.game.add.sprite(this.gameWidth + 105, y + gate, 'pipe');
                 pipe.scale.setTo(-0.435, -0.435);
             }
 
@@ -215,17 +236,20 @@ export class Flappy {
         },
 
         addRowOfPipes: () => {
-            // Randomly pick a number between 450 and 70
-            let value = Math.floor(Math.random() * 450) + 70;
 
-            if (value > 450) {
-                value = 450;
-            } else if (value < 70) {
-                value = 70;
+            let max = 520;
+            let min = 120;
+            // Randomly pick a number between 450 and 70
+            let value = Math.floor(Math.random() * max) + min;
+
+            if (value > max) {
+                value = max;
+            } else if (value < min) {
+                value = min;
             }
 
             let holeP2 = value;
-            let holeP1 = holeP2 - 520;
+            let holeP1 = holeP2 - (max + min);
 
             this.mainState.addOnePipe(0, holeP1);
             this.mainState.addOnePipe(this.gameHeight, holeP2, true);
@@ -273,7 +297,7 @@ export class Flappy {
 
         moveBackground: () => {
             if (!this.background.data.stopPosition) {
-                this.background.tilePosition.x -= 8;
+                this.background.tilePosition.x -= 12;
             } else {
                 this.background.tilePosition.x = this.background.data.stopPosition;
             }
