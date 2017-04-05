@@ -3,6 +3,10 @@ import {ScoreService} from "./score.service";
 
 export class Flappy {
 
+    private EXTREME_SCORE: number = 35;
+    private HARD_SCORE: number = 20;
+    private MEDIUM_SCORE: number = 10;
+
     private game: Phaser.Game;
 
     private labelStyle = { font: "30px IndieFlower", fill: "#000000" };
@@ -21,7 +25,7 @@ export class Flappy {
     private labelHightScore: Phaser.Text;
     private labelCurrentScore: Phaser.Text;
     private jumpSound: Phaser.Sound;
-    private background: Phaser.TileSprite;
+    private backgroundTween: Phaser.Tween;
 
     constructor() {
         this.gameHeight = /*window.innerHeight */600;
@@ -45,10 +49,11 @@ export class Flappy {
         create: () => {
             // Set the background
             this.game.stage.setBackgroundColor('#ffffff');
-            this.background = this.game.add.tileSprite(0, 0, this.gameWidth, this.gameHeight, 'background');
+            let background = this.game.add.sprite(0, 0, 'background');
+            background.scale.setTo(0.6);
+            this.backgroundTween = this.game.add.tween(background)
+                .to({ x: -2800 }, 10000, Phaser.Easing.Linear.None, true, 0, -1);
 
-            this.background.tileScale.x = 0.68;
-            this.background.tileScale.y = 0.68;
 
             // Set the physics system
             this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -77,7 +82,6 @@ export class Flappy {
 
         update: () => {
 
-            this.mainState.moveBackground();
             this.mainState.updateRocketFire();
 
             if (this.gameStarted) {
@@ -86,6 +90,10 @@ export class Flappy {
 
                 // Go through all the pipes
                 this.pipes.forEach((p: Phaser.Sprite) => {
+                    if (this.game.physics.arcade.overlap(this.rocket, p, this.mainState.hitPipe, null, this)) {
+                        return;
+                    }
+
                     if (p.position.x < 0) {
                         p.destroy();
                     } else if (p.position.x < 100.5 && p.position.x > 99.5 && !p.data.scoreDone) {
@@ -94,7 +102,6 @@ export class Flappy {
                         p.data.scoreDone = true;
                     }
                 }, this);
-
 
                 if (this.rocket.y <= 0) {
                     // If the rocket is out of the screen (too low)
@@ -109,8 +116,6 @@ export class Flappy {
                 if (this.rocket.angle < 10)  {
                     this.rocket.angle += 1;
                 }
-
-                this.game.physics.arcade.overlap(this.rocket, this.pipes, this.mainState.hitPipe, null, this);
             } else {
                 if (this.labelClickToStart != null) {
                     this.labelClickToStart.destroy();
@@ -126,7 +131,7 @@ export class Flappy {
                 // LAUNCH GAME
                 this.gameStarted = true;
                 // Add gravity to the rocket to make it fall
-                this.rocket.body.gravity.y = 1900;
+                this.rocket.body.gravity.y = 2500;
 
                 // Show scores
                 this.mainState.updateScore();
@@ -141,7 +146,7 @@ export class Flappy {
 
                 // JUMP
                 // Add a vertical velocity to the rocket
-                this.rocket.body.velocity.y = -560;
+                this.rocket.body.velocity.y = -700;
                 // Play sound
                 this.jumpSound.play();
                 // Create an animation on the rocket
@@ -153,9 +158,9 @@ export class Flappy {
 
             let time;
 
-            if (this.currentScore < 15) {
+            if (this.currentScore < this.MEDIUM_SCORE) {
                 time = 2500;
-            } else if (this.currentScore < 25 ) {
+            } else if (this.currentScore < this.HARD_SCORE) {
                 time = 2200;
             } else {
                 time = 1900;
@@ -170,7 +175,6 @@ export class Flappy {
                 if (this.timer.delay !== time) {
                     this.game.time.events.remove(this.timer);
                     this.timer = this.game.time.events.loop(time, this.mainState.addRowOfPipes);
-                    console.log("change time to : " + time + "ms");
                 }
             }
         },
@@ -238,7 +242,18 @@ export class Flappy {
         addRowOfPipes: () => {
 
             let max = 520;
-            let min = 120;
+            let min;
+
+            if (this.currentScore < this.MEDIUM_SCORE) {
+                min = 200;
+            } else if (this.currentScore < this.HARD_SCORE) {
+                min = 170;
+            } else if (this.currentScore < this.EXTREME_SCORE) {
+                min = 150;
+            } else {
+                min = 130;
+            }
+
             // Randomly pick a number between 450 and 70
             let value = Math.floor(Math.random() * max) + min;
 
@@ -278,7 +293,7 @@ export class Flappy {
             }
 
             // Stop background
-            this.background.data.stopPosition = this.background.tilePosition.x;
+            this.backgroundTween.pause();
 
             // Set the alive property of the rocket to false
             this.rocket.alive = false;
@@ -295,13 +310,6 @@ export class Flappy {
             }, this);
         },
 
-        moveBackground: () => {
-            if (!this.background.data.stopPosition) {
-                this.background.tilePosition.x -= 12;
-            } else {
-                this.background.tilePosition.x = this.background.data.stopPosition;
-            }
-        }
     };
 
 }
