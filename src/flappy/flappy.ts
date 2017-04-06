@@ -7,7 +7,7 @@ import {LooseState} from "./loose.state";
 export class FlappyGame extends Phaser.Game {
 
     constructor() {
-        super(Constantes.width, 600, Phaser.AUTO, 'content', null);
+        super(Constantes.width, Constantes.height, Phaser.AUTO, 'content', null);
 
         this.state.add('boot', BootState);
         this.state.add('menu', MenuState);

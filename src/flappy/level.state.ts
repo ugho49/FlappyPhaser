@@ -54,6 +54,16 @@ export class LevelState extends Phaser.State {
         let spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this);
         this.game.input.onDown.add(this.jump, this);
+
+        if (Constantes.DEBUG) {
+            this.game.time.advancedTiming = true;
+        }
+    }
+
+    render() {
+        if (Constantes.DEBUG) {
+            this.game.debug.text(this.game.time.fps.toString(), 2, 14, "#00ff00");
+        }
     }
 
     update() {

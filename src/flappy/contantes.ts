@@ -1,5 +1,6 @@
 export class Constantes {
 
+    public static DEBUG = true;
     public static GAME_NAME: string = "flappy_game";
 
     public static width: number = 800;
