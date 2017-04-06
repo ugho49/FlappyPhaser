@@ -23,6 +23,13 @@ export class LevelState extends Phaser.State {
     }
 
     create() {
+
+        this.time.advancedTiming = true;
+        //this.game.time.desiredFps = 30;
+        /*if (this.game.raf.isRAF()) {
+            this.game.raf.start();
+        }*/
+
         this.currentScore = 0;
         this.gameStarted = false;
 
@@ -54,10 +61,6 @@ export class LevelState extends Phaser.State {
         let spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this);
         this.game.input.onDown.add(this.jump, this);
-
-        if (Constantes.DEBUG) {
-            this.game.time.advancedTiming = true;
-        }
     }
 
     render() {
@@ -80,12 +83,14 @@ export class LevelState extends Phaser.State {
 
                 if (p.position.x < 0) {
                     p.destroy();
-                } else if (p.position.x < 100.5 && p.position.x > 99.5 && !p.data.scoreDone) {
+                } else if (p.position.x < 105 && p.position.x > 95 && !p.data.scoreDone) {
                     this.currentScore++;
                     this.updateScore();
                     p.data.scoreDone = true;
                 }
             }, this);
+
+            console.log(this.pipes);
 
             if (this.rocket.y <= 0) {
                 // If the rocket is out of the screen (too low)
@@ -111,7 +116,7 @@ export class LevelState extends Phaser.State {
             // LAUNCH GAME
             this.gameStarted = true;
             // Add gravity to the rocket to make it fall
-            this.rocket.body.gravity.y = 2500;
+            this.rocket.body.gravity.y = 2000;
 
             this.rocket.animations.add('walk');
             this.rocket.animations.play('walk', 5, true);
@@ -144,11 +149,11 @@ export class LevelState extends Phaser.State {
         let time;
 
         if (this.currentScore < Constantes.MEDIUM_SCORE) {
-            time = 2500;
+            time = 2200;//2500;
         } else if (this.currentScore < Constantes.HARD_SCORE) {
-            time = 2200;
+            time = 1900;//2200;
         } else {
-            time = 1900;
+            time = 1600;//1900;
         }
 
         if (this.timer == null) {
@@ -196,7 +201,7 @@ export class LevelState extends Phaser.State {
 
     addRowOfPipes()  {
 
-        let max = 520;
+        const max = 520;
         let min;
 
         if (this.currentScore < Constantes.MEDIUM_SCORE) {
@@ -218,8 +223,8 @@ export class LevelState extends Phaser.State {
             value = min;
         }
 
-        let holeP2 = value;
-        let holeP1 = holeP2 - (max + min);
+        const holeP2 = value;
+        const holeP1 = holeP2 - (max + min);
 
         this.addOnePipe(0, holeP1);
         this.addOnePipe(this.game.height, holeP2, true);

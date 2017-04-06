@@ -16,5 +16,4 @@ export class FlappyGame extends Phaser.Game {
 
         this.state.start('boot');
     }
-
 }
